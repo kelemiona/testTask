@@ -25,7 +25,7 @@
      }
 
      public function sortByPublishFrom($offers) {
-        uasort($offers, function($elem, $nextElem){
+        usort($offers, function($elem, $nextElem){
             if (strtotime($elem['publish_from']) == strtotime($nextElem['publish_from'])) {
                 return 0;
             }
