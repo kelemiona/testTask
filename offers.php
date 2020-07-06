@@ -40,5 +40,5 @@
  }
  
  $result = new Offers("http://mega.stage07.scaph.ru/api/1.1/offers/");
- $result = $result->getOffers();
- echo (json_encode($result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK));
+ $result = json_encode($result->getOffers(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK);
+ echo ($result);
