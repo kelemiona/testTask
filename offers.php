@@ -1,15 +1,9 @@
 <?php
+ header("Content-Type: application/json");
  class Offers 
  {
-     public function __construct($url = null)
-     {
-         if ($url) {
-            $AllOffers  = json_decode(@file_get_contents($url),true);
-            $this->preparedOffers = $this->filterOffers($AllOffers);
-            $this->preparedOffers = $this->changePath($this->preparedOffers);
-            $this->preparedOffers = $this->sortByPublishFrom($this->preparedOffers);
-            $this->preparedOffers = json_encode($this->preparedOffers);
-         }
+     public function __construct($url) {
+        $this->offers = json_decode(@file_get_contents($url),true);
      }
 
      public function filterOffers($offers) {
@@ -26,20 +20,26 @@
             $elem['images'][0]['src'] = preg_replace("/^/", 'https://mega.ru', $elem['images'][0]['src']);
             $elem['content'] = preg_replace("/=\"\/upload/", '="https://mega.ru/upload', $elem['content']);
             return $elem;
-        },$offers);
+        }, $offers);
         return $offers;
      }
 
      public function sortByPublishFrom($offers) {
         uasort($offers, function($elem, $nextElem){
-            if ($elem['publish_from'] == $nextElem['publish_from']) {
+            if (strtotime($elem['publish_from']) == strtotime($nextElem['publish_from'])) {
                 return 0;
             }
-            return ($elem['publish_from'] > $nextElem['publish_from']) ? -1 : 1;
+            return (strtotime($elem['publish_from']) > strtotime($nextElem['publish_from'])) ? -1 : 1;
         });
-        return $offers;
+        return  $offers;
+     }
+
+     public function getOffers(){
+       return $this->sortByPublishFrom($this->changePath($this->filterOffers($this->offers)));
      }
  }
  
  $result = new Offers("http://mega.stage07.scaph.ru/api/1.1/offers/");
- print_r($result);
+ $result = $result->getOffers();
+ //print_r($result);
+echo (json_encode($result, JSON_UNESCAPED_UNICODE| JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK));
